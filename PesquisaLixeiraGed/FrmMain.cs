@@ -26,7 +26,7 @@ public partial class FrmMain : Form
 
     LoginJsonToken jsonToken = new();
 
-    private void HandleError(Error? error)
+    private static void HandleError(Error? error)
     {
         string message = $"Código: {error?.ErrorCode}\n" +
                          $"Mensagem: {error?.Message}\n" +
