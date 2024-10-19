@@ -1,0 +1,17 @@
+﻿namespace PesquisaLixeiraGed.Platform.ErrorDefault.Enum;
+
+public enum ReasonEnum
+{
+    BAD_REQUEST,
+    UNAUTHORIZED,
+    PAYMENT_REQUIRED,
+    FORBIDDEN,
+    OBJECT_NOT_FOUND,
+    REQUEST_TIMEOUT,
+    GONE,
+    UNPROCESSABLE,
+    INTERNAL_ERROR,
+    NOT_IMPLEMENTED,
+    SERVICE_UNAVAILABLE,
+    INSUFFICIENT_STORAGE
+}
