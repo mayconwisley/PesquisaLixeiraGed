@@ -180,12 +180,12 @@ public partial class FrmMain : Form
             {
                 HandleError(restored.Error);
             }
-            else
+            else if (!restored.Accepted)
             {
-                return restored.Accepted;
+                return false;
             }
         }
-        return false;
+        return true;
     }
     private async void BtnAcessar_Click(object sender, EventArgs e)
     {
@@ -227,6 +227,10 @@ public partial class FrmMain : Form
                 if (isRestaured)
                 {
                     MessageBox.Show("Itens Restaurados", this.Text);
+                }
+                else
+                {
+                    MessageBox.Show("Erro na restauração do arquivo", this.Text);
                 }
                 await SearchTrash(TxtPesquisa.Text.Trim(), jsonToken);
             }
