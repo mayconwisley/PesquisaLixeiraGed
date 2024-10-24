@@ -158,7 +158,7 @@ public partial class FrmMain : Form
     private async Task<bool> RestoreDocumentTrash(LoginJsonToken loginJsonToken)
     {
 
-        EcmGedDocumentRemoved ecmGedDocumentRemoved = new();
+        EcmGedDocumentRestored ecmGedDocumentRestored = new();
         List<string> document = [];
         foreach (DataGridViewRow row in DgvListTrashFound.Rows)
         {
@@ -174,7 +174,7 @@ public partial class FrmMain : Form
                 FolderId = row.Cells["parentFolder"].Value.ToString()
 
             };
-            var restored = await ecmGedDocumentRemoved.RestoreDocumentRemoved(restoreDocumentsRemovedIn, loginJsonToken.Access_token!);
+            var restored = await ecmGedDocumentRestored.RestoreDocumentRemoved(restoreDocumentsRemovedIn, loginJsonToken.Access_token!);
 
             if (restored.Error is not null)
             {
