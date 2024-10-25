@@ -155,9 +155,9 @@ public partial class FrmMain : Form
         NumPageEnd.Enabled = true;
         BtnResturar.Enabled = true;
     }
-    private async Task<bool> RestoreDocumentTrash(LoginJsonToken loginJsonToken)
+    private async Task<List<string>> RestoreDocumentTrash(LoginJsonToken loginJsonToken)
     {
-
+        List<string> documentsRestored = [];
         EcmGedDocumentRestored ecmGedDocumentRestored = new();
         List<string> document = [];
         foreach (DataGridViewRow row in DgvListTrashFound.Rows)
@@ -166,26 +166,30 @@ public partial class FrmMain : Form
             if (check is not null)
             {
                 document.Add(row.Cells["id"].Value.ToString()!);
-            }
 
-            RestoreDocumentsRemovedIn restoreDocumentsRemovedIn = new()
-            {
-                Documents = document,
-                FolderId = row.Cells["parentFolder"].Value.ToString()
+                RestoreDocumentsRemovedIn restoreDocumentsRemovedIn = new()
+                {
+                    Documents = document,
+                    FolderId = row.Cells["parentFolder"].Value.ToString()
 
-            };
-            var restored = await ecmGedDocumentRestored.RestoreDocumentRemoved(restoreDocumentsRemovedIn, loginJsonToken.Access_token!);
+                };
+                var restored = await ecmGedDocumentRestored.RestoreDocumentRemoved(restoreDocumentsRemovedIn, loginJsonToken.Access_token!);
 
-            if (restored.Error is not null)
-            {
-                HandleError(restored.Error);
-            }
-            else if (!restored.Accepted)
-            {
-                return false;
+                if (restored.Error is not null)
+                {
+                    HandleError(restored.Error);
+                }
+                else if (restored.Accepted)
+                {
+                    documentsRestored.Add($"Documento Restaurado: {row.Cells["title"].Value}");
+                }
+                else
+                {
+                    documentsRestored.Add($"Documento Não Restaurado: {row.Cells["title"].Value}");
+                }
             }
         }
-        return true;
+        return documentsRestored;
     }
     private async void BtnAcessar_Click(object sender, EventArgs e)
     {
@@ -222,16 +226,15 @@ public partial class FrmMain : Form
         {
             if (!string.IsNullOrEmpty(jsonToken.Access_token))
             {
-                var isRestaured = await RestoreDocumentTrash(jsonToken);
+                var documents = await RestoreDocumentTrash(jsonToken);
+                string msg = string.Empty;
+                foreach (var document in documents)
+                {
+                    msg += $"{document}\n";
+                }
 
-                if (isRestaured)
-                {
-                    MessageBox.Show("Itens Restaurados", this.Text);
-                }
-                else
-                {
-                    MessageBox.Show("Erro na restauração do arquivo", this.Text);
-                }
+                MessageBox.Show(msg, this.Text);
+
                 await SearchTrash(TxtPesquisa.Text.Trim(), jsonToken);
             }
         }
