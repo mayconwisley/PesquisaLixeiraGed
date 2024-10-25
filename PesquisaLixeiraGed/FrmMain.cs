@@ -233,7 +233,7 @@ public partial class FrmMain : Form
                     msg += $"{document}\n";
                 }
 
-                MessageBox.Show(msg, this.Text);
+                MessageBox.Show($"O processo de restauração pode levar alguns minutos, aguarde uma notificação na Senior X\n\n{msg}", this.Text);
 
                 await SearchTrash(TxtPesquisa.Text.Trim(), jsonToken);
             }
