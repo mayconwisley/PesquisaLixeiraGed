@@ -226,7 +226,7 @@
             // 
             BtnResturar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             BtnResturar.Enabled = false;
-            BtnResturar.Location = new Point(6, 358);
+            BtnResturar.Location = new Point(3, 358);
             BtnResturar.Name = "BtnResturar";
             BtnResturar.Size = new Size(168, 38);
             BtnResturar.TabIndex = 0;
@@ -349,6 +349,7 @@
             Name = "FrmMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Pesquisar na Lixeira Senior X - Feito por: Maycon Wisley";
+            Load += FrmMain_Load;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             GbPesquisa.ResumeLayout(false);

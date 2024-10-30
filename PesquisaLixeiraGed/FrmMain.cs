@@ -3,6 +3,7 @@ using PesquisaLixeiraGed.Platform.Ecm_Ged.ListDocumentsRemoved;
 using PesquisaLixeiraGed.Platform.Ecm_Ged.RestoreDocumentsRemoved;
 using PesquisaLixeiraGed.Platform.ErrorDefault;
 using PesquisaLixeiraGed.Services;
+using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -191,10 +192,33 @@ public partial class FrmMain : Form
         }
         return documentsRestored;
     }
+
+    private RestoreDocumentsRemovedIn RestoreDocumentsRemovedIn()
+    {
+        List<string> document = [];
+
+        foreach (DataGridViewRow row in DgvListTrashFound.Rows)
+        {
+            var check = row.Cells["Check"].Value;
+            if (check is not null)
+            {
+                document.Add(row.Cells["id"].Value.ToString()!);
+            }
+        }
+        RestoreDocumentsRemovedIn restoreDocumentsRemovedIn = new()
+        {
+            Documents = document,
+        };
+        return restoreDocumentsRemovedIn;
+    }
+
     private async void BtnAcessar_Click(object sender, EventArgs e)
     {
         try
         {
+            Properties.Settings.Default.Username = TxtEmail.Text.Trim();
+            Properties.Settings.Default.Save();
+
             jsonToken = await LoginSeniorX(TxtEmail.Text.Trim(), TxtSenha.Text.Trim());
             if (!string.IsNullOrEmpty(jsonToken.Access_token))
             {
@@ -224,18 +248,28 @@ public partial class FrmMain : Form
     {
         try
         {
-            if (!string.IsNullOrEmpty(jsonToken.Access_token))
+            if (MessageBox.Show("Desaja restaurar os itens selecionados em outra pasta?", this.Text, MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                var documents = await RestoreDocumentTrash(jsonToken);
-                string msg = string.Empty;
-                foreach (var document in documents)
+                var restoreDocumentsRemovedIn = RestoreDocumentsRemovedIn();
+
+                FrmSearchDocument frmSearchDocument = new(jsonToken, restoreDocumentsRemovedIn);
+                frmSearchDocument.ShowDialog();
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(jsonToken.Access_token))
                 {
-                    msg += $"{document}\n";
+                    var documents = await RestoreDocumentTrash(jsonToken);
+                    string msg = string.Empty;
+                    foreach (var document in documents)
+                    {
+                        msg += $"{document}\n";
+                    }
+
+                    MessageBox.Show($"O processo de restauração pode levar alguns minutos, aguarde uma notificação na Senior X\n\n{msg}", this.Text);
+
+                    await SearchTrash(TxtPesquisa.Text.Trim(), jsonToken);
                 }
-
-                MessageBox.Show($"O processo de restauração pode levar alguns minutos, aguarde uma notificação na Senior X\n\n{msg}", this.Text);
-
-                await SearchTrash(TxtPesquisa.Text.Trim(), jsonToken);
             }
         }
         catch (Exception ex)
@@ -266,5 +300,9 @@ public partial class FrmMain : Form
                 GbInfo.Enabled = true;
             }
         }
+    }
+    private void FrmMain_Load(object sender, EventArgs e)
+    {
+        TxtEmail.Text = Properties.Settings.Default.Username;
     }
 }
